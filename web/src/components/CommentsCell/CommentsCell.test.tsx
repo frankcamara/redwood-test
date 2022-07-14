@@ -1,7 +1,7 @@
-import { render, screen, within } from '@redwoodjs/testing/web'
+import { render, screen } from '@redwoodjs/testing/web'
 
-import { Loading, Empty, Failure, Success } from './ArticlesCell'
-import { standard } from './ArticlesCell.mock'
+import { Loading, Empty, Failure, Success } from './CommentsCell'
+import { standard } from './CommentsCell.mock'
 
 // Generated boilerplate tests do not account for all circumstances
 // and can fail without adjustments, e.g. Float and DateTime types.
@@ -9,7 +9,7 @@ import { standard } from './ArticlesCell.mock'
 //        https://redwoodjs.com/docs/testing#testing-cells
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
-describe('ArticlesCell', () => {
+describe('CommentsCell', () => {
   it('renders Loading successfully', () => {
     expect(() => {
       render(<Loading />)
@@ -17,9 +17,8 @@ describe('ArticlesCell', () => {
   })
 
   it('renders Empty successfully', async () => {
-    expect(() => {
-      render(<Empty />)
-    }).not.toThrow()
+    render(<Empty />)
+    expect(screen.getByText('No comments yet')).toBeInTheDocument()
   })
 
   it('renders Failure successfully', async () => {
@@ -35,18 +34,14 @@ describe('ArticlesCell', () => {
   // 2. Add test: expect(screen.getByText('Hello, world')).toBeInTheDocument()
 
   it('renders Success successfully', async () => {
-    const articles = standard().articles
-    render(<Success articles={articles} />)
+    const comments = standard().comments
+    let commentCnt = 0
+    render(<Success comments={comments} />)
 
-    articles.forEach((a) => {
-      const truncBody = a.body.substring(0, 10)
-      const matchedBody = screen.getByText(truncBody, { exact: false })
-      const ellipsis = within(matchedBody).getByText('...', { exact: false })
-
-      expect(screen.getByText(a.title)).toBeInTheDocument()
-      expect(screen.queryByText(a.body)).not.toBeInTheDocument()
-      expect(matchedBody).toBeInTheDocument()
-      expect(ellipsis).toBeInTheDocument()
+    comments.forEach((comment) => {
+      commentCnt++
+      expect(screen.getByText(comment.body)).toBeInTheDocument()
     })
+    expect(commentCnt).toEqual(comments.length)
   })
 })

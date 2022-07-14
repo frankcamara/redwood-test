@@ -1,5 +1,6 @@
+//"postgresql"
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -9,10 +10,11 @@ generator client {
 }
 
 model Post {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   title     String
   body      String
-  createdAt DateTime @default(now())
+  comments  Comment[]
+  createdAt DateTime  @default(now())
 }
 
 model Contact {
@@ -20,6 +22,15 @@ model Contact {
   name      String
   email     String
   message   String
+  createdAt DateTime @default(now())
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  name      String
+  body      String
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
   createdAt DateTime @default(now())
 }
 
@@ -31,4 +42,5 @@ model User {
   salt                String
   resetToken          String?
   resetTokenExpiresAt DateTime?
+  roles               String    @default("moderator")
 }
